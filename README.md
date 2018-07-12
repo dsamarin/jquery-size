@@ -3,7 +3,7 @@
 This package uses the [GitHub API](https://developer.github.com/v3/repos/#list-tags) to list the [jQuery releases](https://github.com/jquery/jquery/releases), downloads them using the [jQuery CDN](https://code.jquery.com/), and records their sizes into a
 [CSV file](https://en.wikipedia.org/wiki/Comma-separated_values).
 
-![image](https://user-images.githubusercontent.com/110829/42649607-010a8e14-85bf-11e8-9130-94a6d7309675.png)
+![image](https://user-images.githubusercontent.com/110829/42650722-01d38c3a-85c2-11e8-8383-7cacb38a1a4a.png)
 
 > Disclaimer: it’s not the file size, it’s how you use it. Sure, jQuery has gotten bigger over time, but every new release patches bugs and/or introduces new features. This [project] aims to demonstrate the importance of HTTP compression and minification.
 >

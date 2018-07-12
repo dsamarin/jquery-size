@@ -18,10 +18,17 @@ type SizeInfo struct {
 	MinZopfli int
 }
 
-func collectReleaseStats(release *Release) (*SizeInfo, error) {
+func collectReleaseStats(release *Release, slim bool) (*SizeInfo, error) {
 	info := &SizeInfo{}
 
-	respNormal, err := http.Get(fmt.Sprintf(jQueryCDN, release.Name))
+	urlNormal := jQueryCDN
+	urlMinified := jQueryMinCDN
+	if slim {
+		urlNormal = jQuerySlimCDN
+		urlMinified = jQuerySlimMinCDN
+	}
+
+	respNormal, err := http.Get(fmt.Sprintf(urlNormal, release.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +39,7 @@ func collectReleaseStats(release *Release) (*SizeInfo, error) {
 		return nil, err
 	}
 
-	respMinified, err := http.Get(fmt.Sprintf(jQueryMinCDN, release.Name))
+	respMinified, err := http.Get(fmt.Sprintf(urlMinified, release.Name))
 	if err != nil {
 		return nil, err
 	}
