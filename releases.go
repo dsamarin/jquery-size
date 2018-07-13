@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 type VersionTag string
@@ -77,11 +79,18 @@ func includeRelease(name string) (ok bool, version VersionTag) {
 	return
 }
 
-func listReleases() (Releases, error) {
+func listReleases(githubtoken string) (Releases, error) {
 	var releases Releases
 
 	ctx := context.Background()
-	client := github.NewClient(nil)
+
+	var httpclient *http.Client
+	if githubtoken != "" {
+		httpclient = oauth2.NewClient(ctx, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: githubtoken},
+		))
+	}
+	client := github.NewClient(httpclient)
 
 	options := &github.ListOptions{
 		PerPage: 50,

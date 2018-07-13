@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>jQuery file size</title>
+    <style type="text/css">html{font:1em/1.6 sans-serif}body{margin:0 auto;width:95%}h1,td,th{text-align:center}#chart{height:750px}table{width:100%;border-collapse:collapse;table-layout:fixed;margin:1em 0}td,th{border:1px solid #d3d3d3;padding:5px}th{background:#e1e1e1}tr span,i{display:none;color:#666}.increase{color:red}.decrease{color:green}tr:hover span{display:inline}tr:hover i{display:block}thead th{background:#666;color:#fff}</style>
+</head>
+<body>
+    <h1>jQuery file size</h1>
+    <p>Note: The gzipped and Zopflinated file sizes refer to the total byte size of the file after compressing it using gzip or Zopfli <em>with the default settings</em>. For gzip, this boils down to <code>gzip -6 file.js</code> — the default compression level is <code>6</code> on a scale from <code>1</code> (fastest, but less compression) to <code>9</code> (slowest, but best compression). For Zopfli, 15 iterations are performed (i.e. the default): <code>zopfli --i15 file.js</code>. Better compression could be achieved by increasing the number of iterations.</p>
+    <p>Disclaimer: it’s not the file size, it’s how you use it. Sure, jQuery has gotten bigger over time, but every new release patches bugs and/or introduces new features. This page aims to demonstrate the importance of HTTP compression and minification.</p>
+    <p>Also note that jQuery 1.8 allows you to create custom builds containing only the modules you need, in case file size is an issue.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>jQuery version</th>
+                <th>Normal file size (bytes)</th>
+                <th>Gzipped file size (bytes)</th>
+                <th>Zopflinated file size (bytes)</th>
+                <th>Minified file size (bytes)</th>
+                <th>Minified and gzipped file size (bytes)</th>
+                <th>Minified and Zopflinated file size (bytes)</th>
+            </tr>
+        </thead>
+        <tbody>{{range $i, $stat := .Stats}}
+            <tr>
+                <th>{{.ReleaseName}}</th>
+                <td>{{formatBytes .Normal}} <span>bytes ({{KB .Normal}} KB)</span>
+                    {{if .Delta}}{{with .Delta}}
+                        <i class={{if gt .Normal 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Normal 0}}+{{end}}{{formatBytes .Normal}} bytes</i>
+                    {{end}}{{end}}
+                </td>
+                <td>{{formatBytes .Gzip}} <span>bytes ({{KB .Gzip}} KB)</span>
+                    {{if .Delta}}{{with .Delta}}
+                        <i class={{if gt .Gzip 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Gzip 0}}+{{end}}{{formatBytes .Gzip}} bytes</i>
+                    {{end}}{{end}}
+                </td>
+                <td>{{formatBytes .Zopfli}} <span>bytes ({{KB .Zopfli}} KB)</span>
+                    {{if .Delta}}{{with .Delta}}
+                        <i class={{if gt .Zopfli 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Zopfli 0}}+{{end}}{{formatBytes .Normal}} bytes</i>
+                    {{end}}{{end}}
+                </td>
+                <td>{{formatBytes .Minified}} <span>bytes ({{KB .Minified}} KB)</span>
+                    {{if .Delta}}{{with .Delta}}
+                        <i class={{if gt .Minified 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Minified 0}}+{{end}}{{formatBytes .Minified}} bytes</i>
+                    {{end}}{{end}}
+                </td>
+                <td>{{formatBytes .MinGzip}} <span>bytes ({{KB .MinGzip}} KB)</span>
+                    {{if .Delta}}{{with .Delta}}
+                        <i class={{if gt .MinGzip 0}}increase{{else}}decrease{{end}}>Δ {{if gt .MinGzip 0}}+{{end}}{{formatBytes .MinGzip}} bytes</i>
+                    {{end}}{{end}}
+                </td>
+                <td>{{formatBytes .MinZopfli}} <span>bytes ({{KB .MinZopfli}} KB)</span>
+                    {{if .Delta}}{{with .Delta}}
+                        <i class={{if gt .MinZopfli 0}}increase{{else}}decrease{{end}}>Δ {{if gt .MinZopfli 0}}+{{end}}{{formatBytes .MinZopfli}} bytes</i>
+                    {{end}}{{end}}
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    <div id="chart"></div>
+<script src="https://www.google.com/jsapi"></script>
+<script>
+google.load('visualization', '1', {
+    packages: ['corechart']
+});
+google.setOnLoadCallback(function() {
+    var c = new google.visualization.DataTable(),
+        a = new google.visualization.NumberFormat({
+            fractionDigits: 0,
+            suffix: ' bytes'
+        }),
+        b = new google.visualization.AreaChart(document.getElementById('chart'));
+    c.addColumn('string', 'Version');
+    c.addColumn('number', 'Uncompressed');
+    c.addColumn('number', 'Gzipped');
+    c.addColumn('number', 'Zopflinated');
+    c.addColumn('number', 'Minified');
+    c.addColumn('number', 'Minified & Gzipped');
+    c.addColumn('number', 'Minified & Zopflinated');
+    c.addRows({{.Stats}});
+    a.format(c, 1);
+    a.format(c, 2);
+    a.format(c, 3);
+    a.format(c, 4);
+    a.format(c, 5);
+    a.format(c, 6);
+    b.draw(c, {
+        hAxis: {
+            title: 'jQuery version'
+        },
+        vAxis: {
+            title: 'File size (bytes)'
+        }
+    })
+});
+</script>
+</body>
+</html>

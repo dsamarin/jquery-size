@@ -2,24 +2,63 @@ package main
 
 import (
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/foobaz/go-zopfli/zopfli"
 )
 
 type SizeInfo struct {
-	Normal    int
-	Minified  int
-	Gzip      int
-	Zopfli    int
-	MinGzip   int
-	MinZopfli int
+	ReleaseName string
+	Normal      int
+	Minified    int
+	Gzip        int
+	Zopfli      int
+	MinGzip     int
+	MinZopfli   int
+	Delta       *SizeInfo
+}
+
+func (stats *SizeInfo) CSVRecord() []string {
+	return []string{
+		stats.ReleaseName,
+		strconv.Itoa(stats.Normal),
+		strconv.Itoa(stats.Gzip),
+		strconv.Itoa(stats.Zopfli),
+		strconv.Itoa(stats.Minified),
+		strconv.Itoa(stats.MinGzip),
+		strconv.Itoa(stats.MinZopfli),
+	}
+}
+
+func (stats *SizeInfo) MarshalJSON() ([]byte, error) {
+	return json.Marshal([]interface{}{
+		stats.ReleaseName,
+		stats.Normal,
+		stats.Gzip,
+		stats.Zopfli,
+		stats.Minified,
+		stats.MinGzip,
+		stats.MinZopfli,
+	})
 }
 
 func collectReleaseStats(release *Release, slim bool) (*SizeInfo, error) {
 	info := &SizeInfo{}
+
+	info.ReleaseName = string(release.Name)
+	if slim {
+		info.ReleaseName += "-slim"
+	}
+
+	// Test data
+	// info.Normal, info.Gzip, info.Zopfli = rand.Intn(300000), rand.Intn(300000), rand.Intn(300000)
+	// info.Minified, info.MinGzip, info.MinZopfli = rand.Intn(300000), rand.Intn(300000), rand.Intn(300000)
+
+	// return info, nil
 
 	urlNormal := jQueryCDN
 	urlMinified := jQueryMinCDN

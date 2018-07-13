@@ -15,5 +15,16 @@ This package uses the [GitHub API](https://developer.github.com/v3/repos/#list-t
 ## Usage
 
 ```sh
-jquery-size > jquery-size-data.csv
+jquery-size -csv "jquery-size-data.csv" -html "jquery-size-data.html"
+```
+
+```
+$ jquery-size -h
+  -csv string
+        the file into which the size data is written in CSV format (or - for stdout)
+  -ghtoken string
+        optional GitHub personal API access token
+  -h    prints this help text
+  -html string
+        the file into which the size data is written in HTML format (or - for stdout)
 ```
