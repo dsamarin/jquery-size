@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"regexp"
 	"sort"
@@ -43,9 +44,19 @@ func (a VersionTag) Less(b VersionTag) bool {
 }
 
 type Release struct {
-	Name VersionTag
-	Hash string
+	Name  VersionTag
+	Hash  string
+	Slim  bool
+	Stats *SizeInfo
 }
+
+func (r *Release) String() string {
+	if r.Slim {
+		return fmt.Sprintf("%s-slim", r.Name)
+	}
+	return string(r.Name)
+}
+
 type Releases []*Release
 
 func (r Releases) Len() int {
@@ -53,6 +64,9 @@ func (r Releases) Len() int {
 }
 
 func (r Releases) Less(i, j int) bool {
+	if r[i].Slim != r[j].Slim {
+		return r[j].Slim
+	}
 	return r[i].Name.Less(r[j].Name)
 }
 
@@ -112,6 +126,15 @@ func listReleases(githubtoken string) (Releases, error) {
 					Name: version,
 					Hash: tag.Commit.GetSHA(),
 				})
+
+				// jQuery versions 3.0.0+ includes a slim build
+				if !version.Less(VersionTag("3")) {
+					releases = append(releases, &Release{
+						Name: version,
+						Hash: tag.Commit.GetSHA(),
+						Slim: true,
+					})
+				}
 			}
 		}
 

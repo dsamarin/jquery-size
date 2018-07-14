@@ -46,60 +46,60 @@ func (stats *SizeInfo) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func collectReleaseStats(release *Release, slim bool) (*SizeInfo, error) {
+func populateReleaseStats(release *Release) error {
 	info := &SizeInfo{}
 
-	info.ReleaseName = string(release.Name)
-	if slim {
-		info.ReleaseName += "-slim"
-	}
+	info.ReleaseName = release.String()
 
 	// Test data
 	// info.Normal, info.Gzip, info.Zopfli = rand.Intn(300000), rand.Intn(300000), rand.Intn(300000)
 	// info.Minified, info.MinGzip, info.MinZopfli = rand.Intn(300000), rand.Intn(300000), rand.Intn(300000)
 
-	// return info, nil
+	// release.Stats = info
+	// return nil
 
 	urlNormal := jQueryCDN
 	urlMinified := jQueryMinCDN
-	if slim {
+	if release.Slim {
 		urlNormal = jQuerySlimCDN
 		urlMinified = jQuerySlimMinCDN
 	}
 
 	respNormal, err := http.Get(fmt.Sprintf(urlNormal, release.Name))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer respNormal.Body.Close()
 
 	bodyNormal, err := ioutil.ReadAll(respNormal.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	respMinified, err := http.Get(fmt.Sprintf(urlMinified, release.Name))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer respMinified.Body.Close()
 
 	bodyMinified, err := ioutil.ReadAll(respMinified.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	info.Normal, info.Gzip, info.Zopfli, err = collectBodyStats(bodyNormal)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	info.Minified, info.MinGzip, info.MinZopfli, err = collectBodyStats(bodyMinified)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return info, nil
+	release.Stats = info
+
+	return nil
 }
 
 func collectBodyStats(body []byte) (normal, gzipped, zopflinated int, err error) {

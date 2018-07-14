@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"log"
 	"os"
+	"sync"
 )
 
 var options struct {
@@ -30,37 +31,38 @@ func init() {
 }
 
 func main() {
+	logger := log.New(os.Stderr, "", 0)
+
+	logger.Println("Downloading list of releases...")
 	releases, err := listReleases(options.githubtoken)
 	if err != nil {
 		panic(err)
 	}
 
-	statsList := []*SizeInfo{}
+	logger.Println("Downloading releases for analysis...")
+
+	var releaseWaitGroup sync.WaitGroup
+	releaseWaitGroup.Add(len(releases))
 
 	for _, release := range releases {
-		fmt.Fprintf(os.Stderr, "%s\n", release.Name)
-		stats, err := collectReleaseStats(release, false)
-		if err != nil {
-			panic(err)
-		}
-
-		statsList = append(statsList, stats)
+		go func(release *Release) {
+			defer releaseWaitGroup.Done()
+			err := populateReleaseStats(release)
+			if err != nil {
+				panic(err)
+			}
+			logger.Printf("✔ %s\n", release)
+		}(release)
 	}
 
+	releaseWaitGroup.Wait()
+
+	statsList := make([]*SizeInfo, 0, len(releases))
 	for _, release := range releases {
-		// jQuery versions 3.0.0+ includes a slim build
-		if release.Name.Less(VersionTag("3")) {
-			continue
-		}
-
-		fmt.Fprintf(os.Stderr, "%s-slim\n", release.Name)
-		stats, err := collectReleaseStats(release, true)
-		if err != nil {
-			panic(err)
-		}
-
-		statsList = append(statsList, stats)
+		statsList = append(statsList, release.Stats)
 	}
+
+	// Write CSV
 
 	if options.csvPath != "" {
 		csvOut := os.Stdout
@@ -76,6 +78,8 @@ func main() {
 			panic(err)
 		}
 	}
+
+	// Write HTML
 
 	if options.htmlPath != "" {
 		htmlOut := os.Stdout
