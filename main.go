@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"sync/atomic"
 )
 
 var options struct {
@@ -43,6 +44,7 @@ func main() {
 
 	var releaseWaitGroup sync.WaitGroup
 	releaseWaitGroup.Add(len(releases))
+	var progress int32
 
 	for _, release := range releases {
 		go func(release *Release) {
@@ -51,7 +53,11 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			logger.Printf("✔ %s\n", release)
+
+			logger.Printf("✔ (%2d/%d) %s\n",
+				atomic.AddInt32(&progress, 1),
+				len(releases),
+				release)
 		}(release)
 	}
 
