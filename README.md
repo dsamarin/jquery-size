@@ -9,7 +9,7 @@ This package uses the [GitHub API](https://developer.github.com/v3/repos/#list-t
 >
 > Also note that jQuery 1.8 allows you to create custom builds containing only the modules you need, in case file size is an issue.
 > 
-> &mdash; [Matthias Bynens](https://mathiasbynens.be/demo/jquery-size)
+> &mdash; [Mathias Bynens](https://mathiasbynens.be/demo/jquery-size)
 
 
 ## Usage
