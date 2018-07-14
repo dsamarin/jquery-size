@@ -15,7 +15,7 @@ This package uses the [GitHub API](https://developer.github.com/v3/repos/#list-t
 ## Usage
 
 ```sh
-jquery-size -csv "jquery-size-data.csv" -html "jquery-size-data.html"
+jquery-size -csv "jquery-size-data.csv" -html "index.html"
 ```
 
 ```
