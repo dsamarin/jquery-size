@@ -28,34 +28,34 @@
             <tr>
                 <th>{{.ReleaseName}}</th>
                 <td>{{formatBytes .Normal}} <span>bytes ({{KB .Normal}} KB)</span>
-                    {{if .Delta}}{{with .Delta}}
+                    {{- if .Delta}}{{with .Delta}}
                         <i class={{if gt .Normal 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Normal 0}}+{{end}}{{formatBytes .Normal}} bytes</i>
-                    {{end}}{{end}}
+                    {{end}}{{end -}}
                 </td>
                 <td>{{formatBytes .Gzip}} <span>bytes ({{KB .Gzip}} KB)</span>
-                    {{if .Delta}}{{with .Delta}}
+                    {{- if .Delta}}{{with .Delta}}
                         <i class={{if gt .Gzip 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Gzip 0}}+{{end}}{{formatBytes .Gzip}} bytes</i>
-                    {{end}}{{end}}
+                    {{end}}{{end -}}
                 </td>
                 <td>{{formatBytes .Zopfli}} <span>bytes ({{KB .Zopfli}} KB)</span>
-                    {{if .Delta}}{{with .Delta}}
+                    {{- if .Delta}}{{with .Delta}}
                         <i class={{if gt .Zopfli 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Zopfli 0}}+{{end}}{{formatBytes .Normal}} bytes</i>
-                    {{end}}{{end}}
+                    {{end}}{{end -}}
                 </td>
                 <td>{{formatBytes .Minified}} <span>bytes ({{KB .Minified}} KB)</span>
-                    {{if .Delta}}{{with .Delta}}
+                    {{- if .Delta}}{{with .Delta}}
                         <i class={{if gt .Minified 0}}increase{{else}}decrease{{end}}>Δ {{if gt .Minified 0}}+{{end}}{{formatBytes .Minified}} bytes</i>
-                    {{end}}{{end}}
+                    {{end}}{{end -}}
                 </td>
                 <td>{{formatBytes .MinGzip}} <span>bytes ({{KB .MinGzip}} KB)</span>
-                    {{if .Delta}}{{with .Delta}}
+                    {{- if .Delta}}{{with .Delta}}
                         <i class={{if gt .MinGzip 0}}increase{{else}}decrease{{end}}>Δ {{if gt .MinGzip 0}}+{{end}}{{formatBytes .MinGzip}} bytes</i>
-                    {{end}}{{end}}
+                    {{end}}{{end -}}
                 </td>
                 <td>{{formatBytes .MinZopfli}} <span>bytes ({{KB .MinZopfli}} KB)</span>
-                    {{if .Delta}}{{with .Delta}}
+                    {{- if .Delta}}{{with .Delta}}
                         <i class={{if gt .MinZopfli 0}}increase{{else}}decrease{{end}}>Δ {{if gt .MinZopfli 0}}+{{end}}{{formatBytes .MinZopfli}} bytes</i>
-                    {{end}}{{end}}
+                    {{end}}{{end -}}
                 </td>
             </tr>
             {{end}}
